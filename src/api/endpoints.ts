@@ -57,5 +57,10 @@ export const API_ENDPOINTS = {
       BY_SAMPLE: (sampleId: number) => `/pathology/samples/${sampleId}/result`,
       BY_ORDER: (orderId: number) => `/pathology/lab-orders/${orderId}/results`,
     },
+    REPORTS: {
+      BASE: '/pathology/reports',
+      BY_ORDER_ID: (orderId: number) => `/pathology/reports/${orderId}`,
+      BY_ORDER_NUMBER: (orderNumber: string) => `/pathology/reports/order-number/${encodeURIComponent(orderNumber)}`,
+    },
   },
 } as const;

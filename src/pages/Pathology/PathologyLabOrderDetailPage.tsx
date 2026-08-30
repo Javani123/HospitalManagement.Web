@@ -8,6 +8,7 @@ import {
   Eye,
   RefreshCw,
   Plus,
+  FileText,
 } from 'lucide-react';
 
 import { pathologyLabOrderService } from '../../services/pathologyLabOrderService';
@@ -246,6 +247,15 @@ export const PathologyLabOrderDetailPage: React.FC = () => {
               onClick={() => navigate('/pathology/lab-orders')}
             >
               Back to Orders
+            </Button>
+            <Button
+              variant="primary"
+              size="md"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              leftIcon={<FileText className="w-4 h-4" />}
+              onClick={() => navigate(`/pathology/reports/${order.id}`)}
+            >
+              View Final Report
             </Button>
           </div>
         }

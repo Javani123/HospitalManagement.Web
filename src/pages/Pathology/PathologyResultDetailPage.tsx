@@ -343,6 +343,19 @@ export const PathologyResultDetailPage: React.FC = () => {
                 Release Result
               </Button>
             )}
+
+            {/* Released -> View Final Report */}
+            {result.status === 'Released' && (
+              <Button
+                variant="primary"
+                size="md"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                leftIcon={<FileCheck2 className="w-4 h-4" />}
+                onClick={() => navigate(`/pathology/reports/${result.pathologyLabOrderId}`)}
+              >
+                View Final Lab Report
+              </Button>
+            )}
           </div>
         }
       />

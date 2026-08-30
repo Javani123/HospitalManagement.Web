@@ -36,6 +36,8 @@ function resolveRouteMeta(pathname: string): { title: string; section?: string }
   if (/^\/pathology\/samples\/\d+$/.test(pathname)) return { title: 'Sample Details', section: 'Laboratory Workflow' };
   // Result detail: /pathology/results/:id
   if (/^\/pathology\/results\/\d+$/.test(pathname)) return { title: 'Diagnostic Result Details', section: 'Laboratory Workflow' };
+  // Final Lab Report: /pathology/reports/:orderId
+  if (/^\/pathology\/reports\/.+$/.test(pathname)) return { title: 'Final Pathology Lab Report', section: 'Laboratory Workflow' };
   // Patient edit: /patients/:id/edit
   if (/^\/patients\/\d+\/edit$/.test(pathname)) return { title: 'Edit Patient', section: 'Operations' };
   // Patient detail: /patients/:id
