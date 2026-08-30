@@ -17,6 +17,7 @@ import { PathologyLabOrderDetailPage } from '../pages/Pathology/PathologyLabOrde
 import { SamplesPage } from '../pages/Pathology/SamplesPage';
 import { SampleDetailPage } from '../pages/Pathology/SampleDetailPage';
 import { ResultsPage } from '../pages/Pathology/ResultsPage';
+import { PathologyResultDetailPage } from '../pages/Pathology/PathologyResultDetailPage';
 import { ReportsPage } from '../pages/Pathology/ReportsPage';
 import { SettingsPlaceholderPage } from '../pages/Settings/SettingsPlaceholderPage';
 import { NotFoundPage } from '../pages/NotFound/NotFoundPage';
@@ -48,6 +49,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/pathology/samples" element={<SamplesPage />} />
         <Route path="/pathology/samples/:id" element={<SampleDetailPage />} />
         <Route path="/pathology/results" element={<ResultsPage />} />
+        <Route path="/pathology/results/:id" element={<PathologyResultDetailPage />} />
         <Route path="/pathology/reports" element={<ReportsPage />} />
 
         {/* Settings Route */}

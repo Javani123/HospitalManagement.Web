@@ -47,5 +47,15 @@ export const API_ENDPOINTS = {
       RECEIVE: (id: number) => `/pathology/samples/${id}/receive`,
       REJECT: (id: number) => `/pathology/samples/${id}/reject`,
     },
+    RESULTS: {
+      BASE: '/pathology/results',
+      BY_ID: (id: number) => `/pathology/results/${id}`,
+      PROCESS: (id: number) => `/pathology/results/${id}/process`,
+      EVALUATE: (id: number) => `/pathology/results/${id}/evaluate`,
+      VERIFY: (id: number) => `/pathology/results/${id}/verify`,
+      RELEASE: (id: number) => `/pathology/results/${id}/release`,
+      BY_SAMPLE: (sampleId: number) => `/pathology/samples/${sampleId}/result`,
+      BY_ORDER: (orderId: number) => `/pathology/lab-orders/${orderId}/results`,
+    },
   },
 } as const;

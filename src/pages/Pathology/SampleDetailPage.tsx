@@ -11,10 +11,12 @@ import {
 } from 'lucide-react';
 
 import { pathologySampleService } from '../../services/pathologySampleService';
+import { pathologyResultService } from '../../services/pathologyResultService';
 import type {
   PathologySampleDto,
   RejectSampleRequest,
 } from '../../types/pathologySample';
+import type { PathologyResultDto } from '../../types/pathologyResult';
 
 import { useApiError } from '../../hooks/useApiError';
 import { useToast } from '../../hooks/useToast';
@@ -23,6 +25,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { StatusBadge } from '../../components/common/StatusBadge';
+import { ResultFlagBadge } from '../../components/common/ResultFlagBadge';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
 import { LoadingState } from '../../components/common/LoadingState';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
@@ -55,7 +58,9 @@ export const SampleDetailPage: React.FC = () => {
   const { toasts, dismiss, success: toastSuccess } = useToast();
 
   const [sample, setSample] = useState<PathologySampleDto | null>(null);
+  const [result, setResult] = useState<PathologyResultDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreatingResult, setIsCreatingResult] = useState(false);
 
   // Action states
   const [isReceiveDialogOpen, setIsReceiveDialogOpen] = useState(false);
@@ -70,8 +75,17 @@ export const SampleDetailPage: React.FC = () => {
     clearError();
     setIsLoading(true);
     try {
-      const data = await pathologySampleService.getById(Number(id));
+      const sampleId = Number(id);
+      const data = await pathologySampleService.getById(sampleId);
       setSample(data);
+
+      // Attempt to load associated result if sample is active
+      try {
+        const resData = await pathologyResultService.getBySampleId(sampleId);
+        setResult(resData);
+      } catch {
+        setResult(null);
+      }
     } catch (err) {
       handleError(err);
     } finally {
@@ -83,6 +97,24 @@ export const SampleDetailPage: React.FC = () => {
     void loadSample();
   }, [loadSample]);
 
+  // Create result entry
+  const handleCreateResult = async () => {
+    if (!sample) return;
+    setIsCreatingResult(true);
+    try {
+      const created = await pathologyResultService.create({
+        pathologySampleId: sample.id,
+      });
+      setResult(created);
+      toastSuccess(`Result entry initialized (Status: Pending).`);
+      navigate(`/pathology/results/${created.id}`);
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setIsCreatingResult(false);
+    }
+  };
+
   // Receive action
   const handleConfirmReceive = async () => {
     if (!sample) return;
@@ -92,6 +124,7 @@ export const SampleDetailPage: React.FC = () => {
       setSample(updated);
       toastSuccess(`Sample ${updated.sampleNumber} marked as Received.`);
       setIsReceiveDialogOpen(false);
+      await loadSample();
     } catch (err) {
       handleError(err);
       setIsReceiveDialogOpen(false);
@@ -371,15 +404,73 @@ export const SampleDetailPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Workflow Navigation Note */}
-      <Card title="Laboratory Workflow Pipeline">
-        <div className="flex items-start gap-3 text-sm text-slate-600">
-          <ClipboardList className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
-          <p>
-            Following receipt, this sample will proceed to <strong>Result Entry (M11)</strong> and{' '}
-            <strong>Verification (M12)</strong> before being published to the diagnostic report.
-          </p>
-        </div>
+      {/* Workflow Navigation & Diagnostic Result Card */}
+      <Card
+        title="Diagnostic Testing & Result Status (M11 & M12)"
+        subtitle="Specimen analytical processing and report workflow"
+      >
+        {result ? (
+          <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-xl space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                  <FlaskConical className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">
+                    Diagnostic Result: {result.resultValue ? `${result.resultValue} ${result.unit || ''}` : 'Pending Value Entry'}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <StatusBadge status={result.status} size="sm" />
+                    <ResultFlagBadge flag={result.resultFlag} size="sm" />
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => navigate(`/pathology/results/${result.id}`)}
+              >
+                Open Result Workflow
+              </Button>
+            </div>
+
+            {result.referenceRange && (
+              <p className="text-xs text-slate-500 font-mono">
+                Reference Range: {result.referenceRange}
+              </p>
+            )}
+          </div>
+        ) : sample.status === 'Received' ? (
+          <div className="p-4 bg-sky-50 border border-sky-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h4 className="text-sm font-bold text-sky-900">
+                Specimen Received — Ready for Testing
+              </h4>
+              <p className="text-xs text-sky-700 mt-0.5">
+                Initialize a diagnostic result entry to begin laboratory measurement and reference range evaluation.
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              isLoading={isCreatingResult}
+              onClick={handleCreateResult}
+            >
+              Start Result Entry
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-start gap-3 text-sm text-slate-600">
+            <ClipboardList className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+            <p>
+              Following physical receipt in the laboratory, this specimen will proceed to{' '}
+              <strong>Result Entry (M11)</strong>, <strong>Reference Range Evaluation (M12)</strong>, and{' '}
+              <strong>Verification</strong> before report release.
+            </p>
+          </div>
+        )}
       </Card>
 
       {/* Receive Dialog */}
