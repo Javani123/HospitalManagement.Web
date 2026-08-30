@@ -37,6 +37,7 @@ export const API_ENDPOINTS = {
     LAB_ORDERS: {
       BASE: '/pathology/lab-orders',
       BY_ID: (id: number) => `/pathology/lab-orders/${id}`,
+      BY_NUMBER: (orderNumber: string) => `/pathology/lab-orders/number/${encodeURIComponent(orderNumber)}`,
     },
   },
 } as const;

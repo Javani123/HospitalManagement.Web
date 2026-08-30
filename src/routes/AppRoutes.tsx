@@ -12,6 +12,8 @@ import { UnitsPage } from '../pages/Pathology/UnitsPage';
 import { TestsPage } from '../pages/Pathology/TestsPage';
 import { ReferenceRangesPage } from '../pages/Pathology/ReferenceRangesPage';
 import { LabOrdersPage } from '../pages/Pathology/LabOrdersPage';
+import { PathologyLabOrderFormPage } from '../pages/Pathology/PathologyLabOrderFormPage';
+import { PathologyLabOrderDetailPage } from '../pages/Pathology/PathologyLabOrderDetailPage';
 import { SamplesPage } from '../pages/Pathology/SamplesPage';
 import { ResultsPage } from '../pages/Pathology/ResultsPage';
 import { ReportsPage } from '../pages/Pathology/ReportsPage';
@@ -40,6 +42,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="/pathology/tests" element={<TestsPage />} />
         <Route path="/pathology/reference-ranges" element={<ReferenceRangesPage />} />
         <Route path="/pathology/lab-orders" element={<LabOrdersPage />} />
+        <Route path="/pathology/lab-orders/new" element={<PathologyLabOrderFormPage />} />
+        <Route path="/pathology/lab-orders/:id" element={<PathologyLabOrderDetailPage />} />
         <Route path="/pathology/samples" element={<SamplesPage />} />
         <Route path="/pathology/results" element={<ResultsPage />} />
         <Route path="/pathology/reports" element={<ReportsPage />} />

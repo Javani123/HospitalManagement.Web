@@ -1,62 +1,48 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ClipboardList, Plus, Search } from 'lucide-react';
+import { pathologyLabOrderService } from '../../services/pathologyLabOrderService';
+import type { PathologyLabOrderDto, PathologyLabOrderFilters, PathologyLabOrderStatus } from '../../types/pathologyLabOrder';
+import { useApiError } from '../../hooks/useApiError';
 import { PageHeader } from '../../components/common/PageHeader';
-import { Badge } from '../../components/common/Badge';
-import { Card } from '../../components/common/Card';
-import { ClipboardList, Clock } from 'lucide-react';
+import { Button } from '../../components/common/Button';
+import { Table, type ColumnDef } from '../../components/common/Table';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { formatCurrency, formatDateTime } from '../../utils/formatters';
+
+const statuses: PathologyLabOrderStatus[] = ['Ordered', 'SampleCollected', 'Processing', 'ResultEntered', 'Verified', 'Reported', 'Cancelled'];
 
 export const LabOrdersPage: React.FC = () => {
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Lab Orders"
-        subtitle="Manage diagnostic laboratory test orders, requisitions, sample collection, and result tracking."
-        breadcrumbs={[
-          { label: 'Dashboard', path: '/dashboard' },
-          { label: 'Pathology', path: '/pathology' },
-          { label: 'Lab Orders' },
-        ]}
-        badge={<Badge variant="warning" size="sm" dot>M9 In Development</Badge>}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card title="Lab Order Workflow (M9)" subtitle="Clinical Diagnostics Life Cycle" className="lg:col-span-2">
-          <div className="space-y-4 text-sm text-slate-600">
-            <p>
-              The backend for <strong>Pathology Lab Orders (M9)</strong> is actively being developed. Frontend models and service methods have been prepared.
-            </p>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2 text-xs">
-              <div className="font-semibold text-slate-800 flex items-center gap-1.5">
-                <ClipboardList className="w-4 h-4 text-amber-600" />
-                <span>Planned Diagnostic Order Flow</span>
-              </div>
-              <ol className="space-y-1 text-slate-600 pl-5 list-decimal">
-                <li><strong>Requisition:</strong> Order placement with patient details and selected test profiles</li>
-                <li><strong>Sample Collection:</strong> Specimen barcode generation & collection timestamping</li>
-                <li><strong>Result Entry:</strong> Quantitative / qualitative parameter values input</li>
-                <li><strong>Verification:</strong> Pathologist sign-off and report generation</li>
-              </ol>
-            </div>
-          </div>
-        </Card>
-
-        <Card title="Service Status" subtitle="Integration Readiness">
-          <div className="space-y-3 text-xs text-slate-600">
-            <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
-              <span>Endpoint</span>
-              <span className="font-mono text-slate-800">/api/pathology/lab-orders</span>
-            </div>
-            <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
-              <span>Frontend Types</span>
-              <span className="font-mono text-blue-600">PathologyLabOrderDto</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-amber-600 font-medium pt-1">
-              <Clock className="w-4 h-4" />
-              <span>Pending M9 backend completion</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
+  const navigate = useNavigate();
+  const { error, clearError, handleError } = useApiError();
+  const [orders, setOrders] = useState<PathologyLabOrderDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [orderNumber, setOrderNumber] = useState('');
+  const [status, setStatus] = useState<PathologyLabOrderStatus | ''>('');
+  const [orderDate, setOrderDate] = useState('');
+  const load = useCallback(async (filters: PathologyLabOrderFilters = {}) => { clearError(); setIsLoading(true); try { setOrders(await pathologyLabOrderService.getAll(filters)); } catch (err) { handleError(err); } finally { setIsLoading(false); } }, [clearError, handleError]);
+  useEffect(() => { void load(); }, [load]);
+  const filter = () => { const filters: PathologyLabOrderFilters = {}; if (orderNumber.trim()) filters.orderNumber = orderNumber.trim(); if (status) filters.status = status; if (orderDate) filters.orderDate = orderDate; void load(filters); };
+  const clear = () => { setOrderNumber(''); setStatus(''); setOrderDate(''); void load(); };
+  const columns: ColumnDef<PathologyLabOrderDto>[] = [
+    { key: 'orderNumber', header: 'Order Number', render: (o) => <span className="font-mono font-semibold text-blue-700">{o.orderNumber}</span> },
+    { key: 'patientName', header: 'Patient', render: (o) => <div><p className="font-medium text-slate-900">{o.patientName}</p><p className="text-xs text-slate-500 font-mono">{o.patientNumber}</p></div> },
+    { key: 'orderDate', header: 'Order Date', render: (o) => formatDateTime(o.orderDate) },
+    { key: 'testCount', header: 'Tests', align: 'center' },
+    { key: 'totalOrderValue', header: 'Order Value', align: 'right', render: (o) => formatCurrency(o.totalOrderValue) },
+    { key: 'status', header: 'Status', align: 'center', render: (o) => <StatusBadge status={o.status} /> },
+    { key: '_actions', header: 'Actions', align: 'right', render: (o) => <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/pathology/lab-orders/${o.id}`); }}>View</Button> },
+  ];
+  return <div className="space-y-6">
+    <PageHeader title="Pathology Lab Orders" subtitle="Create and track tenant-scoped pathology test orders." breadcrumbs={[{ label: 'Dashboard', path: '/dashboard' }, { label: 'Pathology', path: '/pathology' }, { label: 'Lab Orders' }]} actions={<Button leftIcon={<Plus className="w-4 h-4" />} onClick={() => navigate('/pathology/lab-orders/new')}>Create Lab Order</Button>} />
+    <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-4"><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <label className="relative lg:col-span-2"><span className="sr-only">Order number</span><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && filter()} placeholder="Search order number..." className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500" /></label>
+      <select value={status} onChange={(e) => setStatus(e.target.value as PathologyLabOrderStatus | '')} aria-label="Filter by status" className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50"><option value="">All statuses</option>{statuses.map((value) => <option key={value} value={value}>{value.replace(/([a-z])([A-Z])/g, '$1 $2')}</option>)}</select>
+      <input type="date" value={orderDate} onChange={(e) => setOrderDate(e.target.value)} aria-label="Filter by order date" className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50" />
+      <div className="flex gap-2"><Button variant="outline" onClick={filter} disabled={isLoading}>Filter</Button>{(orderNumber || status || orderDate) && <Button variant="ghost" onClick={clear}>Clear</Button>}</div>
+    </div></div>
+    {error && <ErrorAlert error={error} onDismiss={clearError} />}
+    <Table columns={columns} data={orders} keyExtractor={(o) => o.id} isLoading={isLoading} loadingMessage="Loading lab orders..." emptyTitle="No lab orders found" emptyDescription="Create a pathology lab order to begin the diagnostic workflow." emptyIcon={<ClipboardList className="w-6 h-6" />} emptyActionLabel="Create Lab Order" onEmptyAction={() => navigate('/pathology/lab-orders/new')} onRowClick={(o) => navigate(`/pathology/lab-orders/${o.id}`)} striped />
+  </div>;
 };

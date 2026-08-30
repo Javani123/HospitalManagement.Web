@@ -17,8 +17,6 @@ import type {
   PathologyReferenceRangeDto,
   CreatePathologyReferenceRangeDto,
   UpdatePathologyReferenceRangeDto,
-  PathologyLabOrderDto,
-  CreatePathologyLabOrderDto,
 } from '../types/pathology';
 
 /**
@@ -175,23 +173,4 @@ export const pathologyService = {
     },
   },
 
-  // ----------------------------------------------------
-  // 6. Lab Orders (Preview for M9)
-  // ----------------------------------------------------
-  labOrders: {
-    async getAll(): Promise<PathologyLabOrderDto[]> {
-      const res = await apiClient.get<ApiResponse<PathologyLabOrderDto[]>>(API_ENDPOINTS.PATHOLOGY.LAB_ORDERS.BASE);
-      return res.data.data || [];
-    },
-    async getById(id: number): Promise<PathologyLabOrderDto> {
-      const res = await apiClient.get<ApiResponse<PathologyLabOrderDto>>(API_ENDPOINTS.PATHOLOGY.LAB_ORDERS.BY_ID(id));
-      if (res.data.data) return res.data.data;
-      throw new Error(res.data.message || 'Lab order not found');
-    },
-    async create(dto: CreatePathologyLabOrderDto): Promise<PathologyLabOrderDto> {
-      const res = await apiClient.post<ApiResponse<PathologyLabOrderDto>>(API_ENDPOINTS.PATHOLOGY.LAB_ORDERS.BASE, dto);
-      if (res.data.data) return res.data.data;
-      throw new Error(res.data.message || 'Failed to create lab order');
-    },
-  },
 };

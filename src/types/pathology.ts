@@ -153,35 +153,3 @@ export interface UpdatePathologyReferenceRangeDto {
   textVal?: string;
   isActive: boolean;
 }
-
-// ==========================================
-// 6. Pathology Lab Order (M9 preview)
-// ==========================================
-export type PathologyLabOrderStatus = 'Pending' | 'SampleCollected' | 'InProcess' | 'Completed' | 'Cancelled';
-
-export interface PathologyLabOrderItemDto extends BaseEntity {
-  orderId: number;
-  testId: number;
-  testName?: string;
-  price: number;
-}
-
-export interface PathologyLabOrderDto extends BaseEntity {
-  hospitalId: number;
-  patientId: number;
-  patientName?: string;
-  orderNumber: string;
-  orderDate: string;
-  status: PathologyLabOrderStatus;
-  totalAmount: number;
-  items: PathologyLabOrderItemDto[];
-}
-
-export interface CreatePathologyLabOrderItemDto {
-  testId: number;
-}
-
-export interface CreatePathologyLabOrderDto {
-  patientId: number;
-  items: CreatePathologyLabOrderItemDto[];
-}
