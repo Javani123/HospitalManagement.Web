@@ -1,13 +1,17 @@
 export type LabOrderStatus =
   | 'Ordered'
+  | 'SampleCollected'
   | 'Sample Collected'
   | 'In Process'
   | 'Processing'
+  | 'ResultEntered'
   | 'Result Entered'
   | 'Verified'
+  | 'Reported'
   | 'Released'
   | 'Pending'
-  | 'Cancelled';
+  | 'Cancelled'
+  | string;
 
 export interface DashboardStatMetric {
   id: string;
@@ -44,9 +48,10 @@ export interface PendingResultItem {
   patientName: string;
   patientId: string;
   testName: string;
-  status: LabOrderStatus;
+  status: LabOrderStatus | string;
   timeElapsed: string;
-  priority: 'Routine' | 'Urgent' | 'Stat';
+  resultFlag?: string;
+  priority?: 'Routine' | 'Urgent' | 'Stat';
 }
 
 export interface DashboardData {

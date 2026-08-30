@@ -1,7 +1,8 @@
 import React from 'react';
 import { Table, type ColumnDef } from '../../../components/common/Table';
 import { StatusBadge } from '../../../components/common/StatusBadge';
-import { Hourglass, ArrowRight, AlertCircle } from 'lucide-react';
+import { ResultFlagBadge } from '../../../components/common/ResultFlagBadge';
+import { Hourglass, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { PendingResultItem } from '../../../types/dashboard';
 
@@ -35,16 +36,8 @@ export const PendingResultsSection: React.FC<PendingResultsSectionProps> = ({
           <span className="text-sm font-medium text-slate-800 truncate" title={item.testName}>
             {item.testName}
           </span>
-          {item.priority === 'Stat' && (
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 uppercase tracking-wider">
-              <AlertCircle className="w-2.5 h-2.5" />
-              STAT
-            </span>
-          )}
-          {item.priority === 'Urgent' && (
-            <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider">
-              URGENT
-            </span>
+          {item.resultFlag && item.resultFlag !== 'NotEvaluated' && (
+            <ResultFlagBadge flag={item.resultFlag} size="sm" />
           )}
         </div>
       ),
