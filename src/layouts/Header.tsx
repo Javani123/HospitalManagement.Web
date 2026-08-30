@@ -12,6 +12,7 @@ interface HeaderProps {
 const routeTitleMap: Record<string, { title: string; section?: string }> = {
   '/dashboard': { title: 'Dashboard', section: 'Operations' },
   '/patients': { title: 'Patient Directory', section: 'Operations' },
+  '/patients/new': { title: 'Register Patient', section: 'Operations' },
   '/pathology': { title: 'Pathology Management', section: 'Laboratory' },
   '/pathology/test-categories': { title: 'Test Categories', section: 'Laboratory Masters' },
   '/pathology/sample-types': { title: 'Sample Types', section: 'Laboratory Masters' },
@@ -25,14 +26,21 @@ const routeTitleMap: Record<string, { title: string; section?: string }> = {
   '/settings': { title: 'System Settings', section: 'Configuration' },
 };
 
+function resolveRouteMeta(pathname: string): { title: string; section?: string } {
+  // Exact match first
+  if (routeTitleMap[pathname]) return routeTitleMap[pathname];
+  // Patient edit: /patients/:id/edit
+  if (/^\/patients\/\d+\/edit$/.test(pathname)) return { title: 'Edit Patient', section: 'Operations' };
+  // Patient detail: /patients/:id
+  if (/^\/patients\/\d+$/.test(pathname)) return { title: 'Patient Profile', section: 'Operations' };
+  return { title: 'Hospital Management', section: 'Overview' };
+}
+
 export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const location = useLocation();
   const { tenant } = useTenant();
 
-  const currentRouteMeta = routeTitleMap[location.pathname] || {
-    title: 'Hospital Management',
-    section: 'Overview',
-  };
+  const currentRouteMeta = resolveRouteMeta(location.pathname);
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-20 px-4 lg:px-8 flex items-center justify-between gap-4">

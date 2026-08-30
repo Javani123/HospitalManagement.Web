@@ -2,7 +2,9 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '../layouts/AppLayout';
 import { DashboardPage } from '../pages/Dashboard/DashboardPage';
-import { PatientsPlaceholderPage } from '../pages/Patients/PatientsPlaceholderPage';
+import { PatientsListPage } from '../pages/Patients/PatientsListPage';
+import { PatientDetailPage } from '../pages/Patients/PatientDetailPage';
+import { PatientFormPage } from '../pages/Patients/PatientFormPage';
 import { PathologyOverviewPage } from '../pages/Pathology/PathologyOverviewPage';
 import { TestCategoriesPage } from '../pages/Pathology/TestCategoriesPage';
 import { SampleTypesPage } from '../pages/Pathology/SampleTypesPage';
@@ -24,10 +26,13 @@ export const AppRoutes: React.FC = () => {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* Patients Route */}
-        <Route path="/patients" element={<PatientsPlaceholderPage />} />
+        {/* ─── Patient Routes (F3) ─────────────────────────────────────────── */}
+        <Route path="/patients" element={<PatientsListPage />} />
+        <Route path="/patients/new" element={<PatientFormPage />} />
+        <Route path="/patients/:id" element={<PatientDetailPage />} />
+        <Route path="/patients/:id/edit" element={<PatientFormPage />} />
 
-        {/* Pathology Routes */}
+        {/* ─── Pathology Routes ────────────────────────────────────────────── */}
         <Route path="/pathology" element={<PathologyOverviewPage />} />
         <Route path="/pathology/test-categories" element={<TestCategoriesPage />} />
         <Route path="/pathology/sample-types" element={<SampleTypesPage />} />

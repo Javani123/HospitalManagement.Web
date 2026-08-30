@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
   PATIENTS: {
     BASE: '/patients',
     BY_ID: (id: number) => `/patients/${id}`,
+    SEARCH: '/patients/search',
   },
   PATHOLOGY: {
     TEST_CATEGORIES: {
