@@ -29,6 +29,11 @@ const routeTitleMap: Record<string, { title: string; section?: string }> = {
 function resolveRouteMeta(pathname: string): { title: string; section?: string } {
   // Exact match first
   if (routeTitleMap[pathname]) return routeTitleMap[pathname];
+  // Lab Order detail: /pathology/lab-orders/:id
+  if (/^\/pathology\/lab-orders\/\d+$/.test(pathname)) return { title: 'Lab Order Details', section: 'Laboratory Workflow' };
+  if (/^\/pathology\/lab-orders\/new$/.test(pathname)) return { title: 'Create Lab Order', section: 'Laboratory Workflow' };
+  // Sample detail: /pathology/samples/:id
+  if (/^\/pathology\/samples\/\d+$/.test(pathname)) return { title: 'Sample Details', section: 'Laboratory Workflow' };
   // Patient edit: /patients/:id/edit
   if (/^\/patients\/\d+\/edit$/.test(pathname)) return { title: 'Edit Patient', section: 'Operations' };
   // Patient detail: /patients/:id

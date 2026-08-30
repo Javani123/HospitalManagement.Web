@@ -38,6 +38,14 @@ export const API_ENDPOINTS = {
       BASE: '/pathology/lab-orders',
       BY_ID: (id: number) => `/pathology/lab-orders/${id}`,
       BY_NUMBER: (orderNumber: string) => `/pathology/lab-orders/number/${encodeURIComponent(orderNumber)}`,
+      SAMPLES: (orderId: number) => `/pathology/lab-orders/${orderId}/samples`,
+    },
+    SAMPLES: {
+      BASE: '/pathology/samples',
+      BY_ID: (id: number) => `/pathology/samples/${id}`,
+      COLLECT: '/pathology/samples/collect',
+      RECEIVE: (id: number) => `/pathology/samples/${id}/receive`,
+      REJECT: (id: number) => `/pathology/samples/${id}/reject`,
     },
   },
 } as const;
