@@ -17,6 +17,10 @@ export interface PathologyLabOrderDto {
   patientId: number;
   patientNumber: string;
   patientName: string;
+  referringDoctorStaffId?: number | null;
+  referringDoctorName?: string | null;
+  referringDoctorRegistrationNumber?: string | null;
+  referringDoctorSpecialization?: string | null;
   items: PathologyLabOrderItemDto[];
   testCount: number;
   totalOrderValue: number;
@@ -27,6 +31,7 @@ export interface CreatePathologyLabOrderItemRequest { pathologyTestId: number; }
 export interface CreatePathologyLabOrderRequest {
   patientId: number;
   clinicalNotes?: string;
+  referringDoctorStaffId?: number | null;
   items: CreatePathologyLabOrderItemRequest[];
 }
 

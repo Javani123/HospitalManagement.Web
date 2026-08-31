@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Plus,
   FileText,
+  Stethoscope,
 } from 'lucide-react';
 
 import { pathologyLabOrderService } from '../../services/pathologyLabOrderService';
@@ -296,6 +297,31 @@ export const PathologyLabOrderDetailPage: React.FC = () => {
                 <span className="font-semibold text-slate-900">
                   {formatCurrency(order.totalOrderValue)}
                 </span>
+              }
+            />
+            <Field
+              label="Referring Doctor"
+              value={
+                order.referringDoctorName ? (
+                  <div>
+                    <div className="flex items-center gap-1.5 font-bold text-teal-900">
+                      <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
+                      <span>{order.referringDoctorName}</span>
+                    </div>
+                    <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
+                      {order.referringDoctorRegistrationNumber && (
+                        <span className="font-mono text-teal-700 font-semibold bg-teal-50 border border-teal-200 px-1.5 py-0.2 rounded">
+                          {order.referringDoctorRegistrationNumber}
+                        </span>
+                      )}
+                      {order.referringDoctorSpecialization && (
+                        <span>• {order.referringDoctorSpecialization}</span>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-slate-400 italic">No Referring Doctor (Self-Referred)</span>
+                )
               }
             />
             {order.clinicalNotes && (

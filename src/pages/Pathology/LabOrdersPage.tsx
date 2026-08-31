@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Plus, Search } from 'lucide-react';
+import { ClipboardList, Plus, Search, Stethoscope } from 'lucide-react';
 import { pathologyLabOrderService } from '../../services/pathologyLabOrderService';
 import type { PathologyLabOrderDto, PathologyLabOrderFilters, PathologyLabOrderStatus } from '../../types/pathologyLabOrder';
 import { useApiError } from '../../hooks/useApiError';
@@ -28,6 +28,25 @@ export const LabOrdersPage: React.FC = () => {
   const columns: ColumnDef<PathologyLabOrderDto>[] = [
     { key: 'orderNumber', header: 'Order Number', render: (o) => <span className="font-mono font-semibold text-blue-700">{o.orderNumber}</span> },
     { key: 'patientName', header: 'Patient', render: (o) => <div><p className="font-medium text-slate-900">{o.patientName}</p><p className="text-xs text-slate-500 font-mono">{o.patientNumber}</p></div> },
+    {
+      key: 'referringDoctor',
+      header: 'Referring Doctor',
+      render: (o) => (
+        o.referringDoctorName ? (
+          <div className="text-xs">
+            <p className="font-semibold text-slate-800 flex items-center gap-1">
+              <Stethoscope className="w-3 h-3 text-teal-600 shrink-0" />
+              <span>{o.referringDoctorName}</span>
+            </p>
+            <p className="text-[11px] text-slate-400 font-mono">
+              {o.referringDoctorRegistrationNumber || '—'}
+            </p>
+          </div>
+        ) : (
+          <span className="text-xs text-slate-400 italic">Self-Referred</span>
+        )
+      ),
+    },
     { key: 'orderDate', header: 'Order Date', render: (o) => formatDateTime(o.orderDate) },
     { key: 'testCount', header: 'Tests', align: 'center' },
     { key: 'totalOrderValue', header: 'Order Value', align: 'right', render: (o) => formatCurrency(o.totalOrderValue) },
