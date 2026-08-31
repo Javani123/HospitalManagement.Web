@@ -16,6 +16,8 @@ const routeTitleMap: Record<string, { title: string; section?: string }> = {
   '/patients/new': { title: 'Register Patient', section: 'Operations' },
   '/departments': { title: 'Departments', section: 'Organization' },
   '/staff': { title: 'Staff Directory', section: 'Organization' },
+  '/doctors': { title: 'Doctor Profiles', section: 'Organization' },
+  '/technicians': { title: 'Technician Profiles', section: 'Organization' },
   '/pathology': { title: 'Pathology Management', section: 'Laboratory' },
   '/pathology/test-categories': { title: 'Test Categories', section: 'Laboratory Masters' },
   '/pathology/sample-types': { title: 'Sample Types', section: 'Laboratory Masters' },
@@ -27,6 +29,7 @@ const routeTitleMap: Record<string, { title: string; section?: string }> = {
   '/pathology/results': { title: 'Result Entry & Verification', section: 'Laboratory Workflow' },
   '/pathology/reports': { title: 'Diagnostic Reports', section: 'Laboratory Workflow' },
   '/roles': { title: 'Roles & Permissions', section: 'Administration' },
+  '/audit-actor': { title: 'Audit Actor', section: 'Administration' },
   '/settings': { title: 'System Settings', section: 'Configuration' },
 };
 

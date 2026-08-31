@@ -12,6 +12,9 @@ import { PatientFormPage } from '../pages/Patients/PatientFormPage';
 import { DepartmentsPage } from '../pages/Departments/DepartmentsPage';
 import { StaffPage } from '../pages/Staff/StaffPage';
 import { RolesPage } from '../pages/Roles/RolesPage';
+import { DoctorsPage } from '../pages/Doctors/DoctorsPage';
+import { TechniciansPage } from '../pages/Technicians/TechniciansPage';
+import { AuditActorPage } from '../pages/Audit/AuditActorPage';
 import { PathologyOverviewPage } from '../pages/Pathology/PathologyOverviewPage';
 import { TestCategoriesPage } from '../pages/Pathology/TestCategoriesPage';
 import { SampleTypesPage } from '../pages/Pathology/SampleTypesPage';
@@ -64,6 +67,15 @@ export const AppRoutes: React.FC = () => {
 
           {/* ─── Roles & Permissions Routes (F14.4) ───────────────────────────── */}
           <Route path="/roles" element={<RolesPage />} />
+
+          {/* ─── Doctor Profile Master Routes (F14.5) ─────────────────────────── */}
+          <Route path="/doctors" element={<DoctorsPage />} />
+
+          {/* ─── Technician Profile Master Routes (F14.6) ─────────────────────── */}
+          <Route path="/technicians" element={<TechniciansPage />} />
+
+          {/* ─── Audit Actor & User-Staff Linkage (F14.7) ────────────────────── */}
+          <Route path="/audit-actor" element={<AuditActorPage />} />
 
           {/* ─── Pathology Routes ────────────────────────────────────────────── */}
           <Route path="/pathology" element={<PathologyOverviewPage />} />

@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Users,
   UserCheck,
+  Stethoscope,
   FlaskConical,
   FolderTree,
   TestTube,
@@ -20,6 +21,7 @@ import {
   X,
   LogOut,
   Shield,
+  Fingerprint,
 } from 'lucide-react';
 import { useTenant } from '../hooks/useTenant';
 import { useAuth } from '../hooks/useAuth';
@@ -55,8 +57,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
   const canViewPatients = isAdmin || hasAnyRole(['Doctor', 'Receptionist', 'Nurse', 'Accountant']);
   const canViewDepartments = isAdmin || hasAnyRole(['Doctor', 'Technician', 'LabDirector', 'Receptionist', 'Nurse', 'Accountant']);
   const canViewStaff = isAdmin || hasAnyRole(['Doctor', 'Technician', 'LabDirector', 'Receptionist', 'Nurse', 'Accountant']);
+  const canViewDoctors = isAdmin || hasAnyRole(['Doctor', 'Technician', 'LabDirector', 'Receptionist', 'Nurse', 'Accountant']);
+  const canViewTechnicians = isAdmin || hasAnyRole(['Doctor', 'Technician', 'LabDirector', 'Receptionist', 'Nurse', 'Accountant']);
   const canViewPathology = isAdmin || hasAnyRole(['Technician', 'LabDirector', 'Doctor', 'Nurse']);
   const canViewRoles = isAdmin;
+  const canViewAuditActor = isAdmin;
   const canViewSettings = isAdmin;
 
   // Granular pathology item permissions
@@ -175,6 +180,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
                   to="/staff"
                   icon={<UserCheck className="w-4 h-4" />}
                   label="Staff"
+                  onClick={onCloseMobile}
+                />
+              )}
+              {canViewDoctors && (
+                <SidebarItem
+                  to="/doctors"
+                  icon={<Stethoscope className="w-4 h-4" />}
+                  label="Doctors"
+                  onClick={onCloseMobile}
+                />
+              )}
+              {canViewTechnicians && (
+                <SidebarItem
+                  to="/technicians"
+                  icon={<Microscope className="w-4 h-4" />}
+                  label="Technicians"
                   onClick={onCloseMobile}
                 />
               )}
@@ -317,6 +338,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
                     to="/roles"
                     icon={<Shield className="w-4 h-4" />}
                     label="Roles & Permissions"
+                    onClick={onCloseMobile}
+                  />
+                )}
+                {canViewAuditActor && (
+                  <SidebarItem
+                    to="/audit-actor"
+                    icon={<Fingerprint className="w-4 h-4" />}
+                    label="Audit Actor"
                     onClick={onCloseMobile}
                   />
                 )}

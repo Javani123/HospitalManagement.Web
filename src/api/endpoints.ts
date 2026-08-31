@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
     LOGIN: '/auth/login',
     ME: '/auth/me',
     ADMIN_CHECK: '/auth/admin-check',
+    LINK_STAFF: (userId: number) => `/auth/users/${userId}/staff`,
   },
   TENANT: {
     CURRENT: '/tenant/current',
@@ -33,6 +34,16 @@ export const API_ENDPOINTS = {
   USER_ROLES: {
     BY_USER_ID: (userId: number) => `/users/${userId}/roles`,
     USER_ROLE_ITEM: (userId: number, roleId: number) => `/users/${userId}/roles/${roleId}`,
+  },
+  DOCTORS: {
+    BASE: '/doctors',
+    BY_ID: (id: number) => `/doctors/${id}`,
+    BY_STAFF_ID: (staffId: number) => `/doctors/by-staff/${staffId}`,
+  },
+  TECHNICIANS: {
+    BASE: '/technicians',
+    BY_ID: (id: number) => `/technicians/${id}`,
+    BY_STAFF_ID: (staffId: number) => `/technicians/by-staff/${staffId}`,
   },
   PATHOLOGY: {
     TEST_CATEGORIES: {

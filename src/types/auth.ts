@@ -21,6 +21,8 @@ export interface AuthUser {
   roles: string[];
 }
 
+export type UserDto = AuthUser;
+
 export interface LoginResponse {
   token: string;
   expiresAt: string;
