@@ -4,6 +4,11 @@
  */
 export const API_ENDPOINTS = {
   HEALTH: '/health',
+  AUTH: {
+    LOGIN: '/auth/login',
+    ME: '/auth/me',
+    ADMIN_CHECK: '/auth/admin-check',
+  },
   TENANT: {
     CURRENT: '/tenant/current',
   },
@@ -11,6 +16,23 @@ export const API_ENDPOINTS = {
     BASE: '/patients',
     BY_ID: (id: number) => `/patients/${id}`,
     SEARCH: '/patients/search',
+  },
+  DEPARTMENTS: {
+    BASE: '/departments',
+    BY_ID: (id: number) => `/departments/${id}`,
+  },
+  STAFF: {
+    BASE: '/staff',
+    BY_ID: (id: number) => `/staff/${id}`,
+    BY_NUMBER: (employeeNumber: string) => `/staff/number/${encodeURIComponent(employeeNumber)}`,
+  },
+  ROLES: {
+    BASE: '/roles',
+    BY_ID: (id: number) => `/roles/${id}`,
+  },
+  USER_ROLES: {
+    BY_USER_ID: (userId: number) => `/users/${userId}/roles`,
+    USER_ROLE_ITEM: (userId: number, roleId: number) => `/users/${userId}/roles/${roleId}`,
   },
   PATHOLOGY: {
     TEST_CATEGORIES: {

@@ -1,10 +1,17 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '../layouts/AppLayout';
+import { ProtectedRoute } from '../components/common/ProtectedRoute';
+import { PublicRoute } from '../components/common/PublicRoute';
+import { LoginPage } from '../pages/Auth/LoginPage';
+import { ForbiddenPage } from '../pages/Forbidden/ForbiddenPage';
 import { DashboardPage } from '../pages/Dashboard/DashboardPage';
 import { PatientsListPage } from '../pages/Patients/PatientsListPage';
 import { PatientDetailPage } from '../pages/Patients/PatientDetailPage';
 import { PatientFormPage } from '../pages/Patients/PatientFormPage';
+import { DepartmentsPage } from '../pages/Departments/DepartmentsPage';
+import { StaffPage } from '../pages/Staff/StaffPage';
+import { RolesPage } from '../pages/Roles/RolesPage';
 import { PathologyOverviewPage } from '../pages/Pathology/PathologyOverviewPage';
 import { TestCategoriesPage } from '../pages/Pathology/TestCategoriesPage';
 import { SampleTypesPage } from '../pages/Pathology/SampleTypesPage';
@@ -26,39 +33,64 @@ import { NotFoundPage } from '../pages/NotFound/NotFoundPage';
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
-        {/* Default route redirect to dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+      {/* ─── Public Authentication Route ──────────────────────────────────── */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
 
-        {/* ─── Patient Routes (F3) ─────────────────────────────────────────── */}
-        <Route path="/patients" element={<PatientsListPage />} />
-        <Route path="/patients/new" element={<PatientFormPage />} />
-        <Route path="/patients/:id" element={<PatientDetailPage />} />
-        <Route path="/patients/:id/edit" element={<PatientFormPage />} />
+      {/* ─── Protected Application Routes (Requires Authentication) ────────── */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          {/* Default route redirect to dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* ─── Pathology Routes ────────────────────────────────────────────── */}
-        <Route path="/pathology" element={<PathologyOverviewPage />} />
-        <Route path="/pathology/test-categories" element={<TestCategoriesPage />} />
-        <Route path="/pathology/sample-types" element={<SampleTypesPage />} />
-        <Route path="/pathology/units" element={<UnitsPage />} />
-        <Route path="/pathology/tests" element={<TestsPage />} />
-        <Route path="/pathology/reference-ranges" element={<ReferenceRangesPage />} />
-        <Route path="/pathology/lab-orders" element={<LabOrdersPage />} />
-        <Route path="/pathology/lab-orders/new" element={<PathologyLabOrderFormPage />} />
-        <Route path="/pathology/lab-orders/:id" element={<PathologyLabOrderDetailPage />} />
-        <Route path="/pathology/samples" element={<SamplesPage />} />
-        <Route path="/pathology/samples/:id" element={<SampleDetailPage />} />
-        <Route path="/pathology/results" element={<ResultsPage />} />
-        <Route path="/pathology/results/:id" element={<PathologyResultDetailPage />} />
-        <Route path="/pathology/reports" element={<ReportsPage />} />
-        <Route path="/pathology/reports/:orderId" element={<PathologyLabReportPage />} />
+          {/* ─── Patient Routes (F3) ─────────────────────────────────────────── */}
+          <Route path="/patients" element={<PatientsListPage />} />
+          <Route path="/patients/new" element={<PatientFormPage />} />
+          <Route path="/patients/:id" element={<PatientDetailPage />} />
+          <Route path="/patients/:id/edit" element={<PatientFormPage />} />
 
-        {/* Settings Route */}
-        <Route path="/settings" element={<SettingsPlaceholderPage />} />
+          {/* ─── Department Master Routes (F14.2) ─────────────────────────────── */}
+          <Route path="/departments" element={<DepartmentsPage />} />
 
-        {/* Fallback 404 Route */}
-        <Route path="*" element={<NotFoundPage />} />
+          {/* ─── Staff Master Routes (F14.3) ──────────────────────────────────── */}
+          <Route path="/staff" element={<StaffPage />} />
+
+          {/* ─── Roles & Permissions Routes (F14.4) ───────────────────────────── */}
+          <Route path="/roles" element={<RolesPage />} />
+
+          {/* ─── Pathology Routes ────────────────────────────────────────────── */}
+          <Route path="/pathology" element={<PathologyOverviewPage />} />
+          <Route path="/pathology/test-categories" element={<TestCategoriesPage />} />
+          <Route path="/pathology/sample-types" element={<SampleTypesPage />} />
+          <Route path="/pathology/units" element={<UnitsPage />} />
+          <Route path="/pathology/tests" element={<TestsPage />} />
+          <Route path="/pathology/reference-ranges" element={<ReferenceRangesPage />} />
+          <Route path="/pathology/lab-orders" element={<LabOrdersPage />} />
+          <Route path="/pathology/lab-orders/new" element={<PathologyLabOrderFormPage />} />
+          <Route path="/pathology/lab-orders/:id" element={<PathologyLabOrderDetailPage />} />
+          <Route path="/pathology/samples" element={<SamplesPage />} />
+          <Route path="/pathology/samples/:id" element={<SampleDetailPage />} />
+          <Route path="/pathology/results" element={<ResultsPage />} />
+          <Route path="/pathology/results/:id" element={<PathologyResultDetailPage />} />
+          <Route path="/pathology/reports" element={<ReportsPage />} />
+          <Route path="/pathology/reports/:orderId" element={<PathologyLabReportPage />} />
+
+          {/* ─── Settings / Configuration ────────────────────────────────────── */}
+          <Route path="/settings" element={<SettingsPlaceholderPage />} />
+
+          {/* ─── Forbidden Access Restricted Route ───────────────────────────── */}
+          <Route path="/forbidden" element={<ForbiddenPage />} />
+
+          {/* ─── Fallback 404 Route ──────────────────────────────────────────── */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Route>
     </Routes>
   );

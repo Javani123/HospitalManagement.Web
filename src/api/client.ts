@@ -15,11 +15,17 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
+export const AUTH_TOKEN_STORAGE_KEY = 'caresync_auth_token';
+
 // Request Interceptor: Attach tenant / auth context
 apiClient.interceptors.request.use(
   (reqConfig: InternalAxiosRequestConfig) => {
-    // In local dev, backend resolves tenant from DevTenantContext (HospitalId: 1).
-    // Future SaaS versions can attach 'X-Hospital-Id' or Authorization tokens here.
+    // Attach JWT Authorization header if present in storage
+    const token = typeof window !== 'undefined' ? localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) : null;
+    if (token && reqConfig.headers) {
+      reqConfig.headers.Authorization = `Bearer ${token}`;
+    }
+
     return reqConfig;
   },
   (error: unknown) => {
@@ -34,8 +40,21 @@ apiClient.interceptors.response.use(
   },
   (error: unknown) => {
     const normalizedError = normalizeApiError(error);
+
+    // If 401 Unauthorized occurs on an authenticated route, clear storage and notify app
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      const url = error.config?.url || '';
+      if (!url.includes('/auth/login')) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+          window.dispatchEvent(new CustomEvent('caresync:unauthorized'));
+        }
+      }
+    }
+
     return Promise.reject(normalizedError);
   }
 );
 
 export default apiClient;
+
