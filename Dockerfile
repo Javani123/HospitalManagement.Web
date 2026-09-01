@@ -1,9 +1,9 @@
-﻿# Stage 1: Build Frontend
+# Stage 1: Build Frontend
 FROM node:20-alpine AS build
 WORKDIR /app
 
-# Accept API URL build argument
-ARG VITE_API_BASE_URL
+# Accept API URL build argument with live default
+ARG VITE_API_BASE_URL=https://hospitalmanagement-qfpj.onrender.com/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 COPY package*.json ./

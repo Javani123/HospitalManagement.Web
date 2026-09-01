@@ -7,9 +7,20 @@ const getEnvVar = (key: keyof ImportMetaEnv, defaultValue: string = ''): string 
   return import.meta.env[key] || defaultValue;
 };
 
+const resolveApiBaseUrl = (): string => {
+  let url = getEnvVar('VITE_API_BASE_URL', 'https://hospitalmanagement-qfpj.onrender.com/api').trim();
+  // Strip trailing slashes
+  url = url.replace(/\/+$/, '');
+  // If the user provided URL without /api, append /api automatically
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  return url;
+};
+
 export const config = {
   api: {
-    baseUrl: getEnvVar('VITE_API_BASE_URL', 'http://localhost:5000/api'),
+    baseUrl: resolveApiBaseUrl(),
     timeout: 30000,
   },
   app: {
