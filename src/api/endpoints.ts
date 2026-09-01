@@ -96,4 +96,41 @@ export const API_ENDPOINTS = {
       BY_ORDER_NUMBER: (orderNumber: string) => `/pathology/reports/order-number/${encodeURIComponent(orderNumber)}`,
     },
   },
+  COMMISSIONS: {
+    RULES: {
+      BASE: '/commissions/rules',
+      BY_ID: (id: number) => `/commissions/rules/${id}`,
+    },
+  },
+  BILLING: {
+    INVOICES: {
+      BASE: '/billing/invoices',
+      BY_ID: (id: number) => `/billing/invoices/${id}`,
+      BY_NUMBER: (invoiceNumber: string) => `/billing/invoices/number/${encodeURIComponent(invoiceNumber)}`,
+      BY_ORDER: (orderId: number) => `/billing/invoices/by-order/${orderId}`,
+      CANCEL: (id: number) => `/billing/invoices/${id}/cancel`,
+    },
+    PAYMENTS: {
+      BASE: '/billing/payments',
+      BY_ID: (id: number) => `/billing/payments/${id}`,
+      BY_NUMBER: (paymentNumber: string) => `/billing/payments/number/${encodeURIComponent(paymentNumber)}`,
+      BY_INVOICE: (invoiceId: number) => `/billing/invoices/${invoiceId}/payments`,
+      VOID: (id: number) => `/billing/payments/${id}/void`,
+    },
+  },
+  ACCOUNTING: {
+    ACCOUNTS: {
+      BASE: '/accounting/accounts',
+      BY_ID: (id: number) => `/accounting/accounts/${id}`,
+    },
+    JOURNALS: {
+      BASE: '/accounting/journals',
+      BY_ID: (id: number) => `/accounting/journals/${id}`,
+    },
+    LEDGER: '/accounting/ledger',
+    TRIAL_BALANCE: '/accounting/trial-balance',
+    SUMMARY: '/accounting/summary',
+  },
 } as const;
+
+

@@ -9,11 +9,14 @@ import {
   RefreshCw,
   Plus,
   FileText,
-  Stethoscope,
+  Percent,
+  Coins,
+  Receipt,
 } from 'lucide-react';
 
 import { pathologyLabOrderService } from '../../services/pathologyLabOrderService';
 import { pathologySampleService } from '../../services/pathologySampleService';
+import { invoiceService } from '../../services/invoiceService';
 
 import type {
   PathologyLabOrderDto,
@@ -24,6 +27,7 @@ import type {
   CollectSampleRequest,
   RejectSampleRequest,
 } from '../../types/pathologySample';
+import type { InvoiceDto } from '../../types/invoice';
 
 import { useApiError } from '../../hooks/useApiError';
 import { useToast } from '../../hooks/useToast';
@@ -40,6 +44,7 @@ import { formatCurrency, formatDateTime } from '../../utils/formatters';
 
 import { CollectSampleModal } from './components/CollectSampleModal';
 import { RejectSampleModal } from './components/RejectSampleModal';
+import { InvoiceModal } from '../Billing/components/InvoiceModal';
 
 const Field = ({
   label,
@@ -68,7 +73,11 @@ export const PathologyLabOrderDetailPage: React.FC = () => {
 
   const [order, setOrder] = useState<PathologyLabOrderDto | null>(null);
   const [samples, setSamples] = useState<PathologySampleDto[]>([]);
+  const [invoice, setInvoice] = useState<InvoiceDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Invoice modal state
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   // Collect Sample state
   const [collectingItem, setCollectingItem] = useState<PathologyLabOrderItemDto | null>(null);
@@ -90,12 +99,14 @@ export const PathologyLabOrderDetailPage: React.FC = () => {
     setIsLoading(true);
     try {
       const orderId = Number(id);
-      const [orderData, samplesData] = await Promise.all([
+      const [orderData, samplesData, invoiceData] = await Promise.all([
         pathologyLabOrderService.getById(orderId),
         pathologySampleService.getByOrder(orderId),
+        invoiceService.getByOrder(orderId).catch(() => null),
       ]);
       setOrder(orderData);
       setSamples(samplesData);
+      setInvoice(invoiceData);
     } catch (err) {
       handleError(err);
     } finally {
@@ -266,15 +277,14 @@ export const PathologyLabOrderDetailPage: React.FC = () => {
         <ErrorAlert error={error} onDismiss={clearError} />
       )}
 
-      {/* Order Info & Patient Context */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Order Info, Patient Context, Referring Doctor Commission & Billing */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* Order Information */}
         <Card
           title="Order Information"
           subtitle="Backend-generated order metadata"
-          className="lg:col-span-2"
         >
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <dl className="space-y-3.5">
             <Field
               label="Order Number"
               value={
@@ -299,35 +309,8 @@ export const PathologyLabOrderDetailPage: React.FC = () => {
                 </span>
               }
             />
-            <Field
-              label="Referring Doctor"
-              value={
-                order.referringDoctorName ? (
-                  <div>
-                    <div className="flex items-center gap-1.5 font-bold text-teal-900">
-                      <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
-                      <span>{order.referringDoctorName}</span>
-                    </div>
-                    <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-                      {order.referringDoctorRegistrationNumber && (
-                        <span className="font-mono text-teal-700 font-semibold bg-teal-50 border border-teal-200 px-1.5 py-0.2 rounded">
-                          {order.referringDoctorRegistrationNumber}
-                        </span>
-                      )}
-                      {order.referringDoctorSpecialization && (
-                        <span>• {order.referringDoctorSpecialization}</span>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <span className="text-slate-400 italic">No Referring Doctor (Self-Referred)</span>
-                )
-              }
-            />
             {order.clinicalNotes && (
-              <div className="sm:col-span-2">
-                <Field label="Clinical Notes" value={order.clinicalNotes} />
-              </div>
+              <Field label="Clinical Notes" value={order.clinicalNotes} />
             )}
           </dl>
         </Card>
@@ -356,6 +339,191 @@ export const PathologyLabOrderDetailPage: React.FC = () => {
               View Patient Profile
             </Button>
           </div>
+        </Card>
+
+        {/* Referring Doctor & Commission Snapshot Card (F14.9) */}
+        <Card
+          title="Referring Doctor & Commission"
+          subtitle="Immutable historical commission snapshot"
+        >
+          {order.referringDoctorName ? (
+            <div className="space-y-3">
+              {/* Doctor Details */}
+              <div className="p-2.5 bg-teal-50/70 border border-teal-100 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    Dr
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-slate-900 text-xs truncate">
+                      {order.referringDoctorName}
+                    </p>
+                    <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                      {order.referringDoctorRegistrationNumber && (
+                        <span className="font-mono text-teal-800 font-semibold bg-teal-100/70 px-1 py-0.2 rounded">
+                          {order.referringDoctorRegistrationNumber}
+                        </span>
+                      )}
+                      {order.referringDoctorSpecialization && (
+                        <span className="truncate">• {order.referringDoctorSpecialization}</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Commission Snapshot */}
+              {order.commission ? (
+                <dl className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2 bg-slate-50 border border-slate-200/60 rounded-lg">
+                    <dt className="text-[10px] font-medium text-slate-500">Commission Type</dt>
+                    <dd className="mt-0.5 font-semibold text-slate-900 flex items-center gap-1">
+                      {order.commission.type.toLowerCase() === 'percentage' ? (
+                        <span className="inline-flex items-center gap-0.5 text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded text-[10px] font-semibold">
+                          <Percent className="w-2.5 h-2.5" /> Percentage
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-0.5 text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded text-[10px] font-semibold">
+                          <Coins className="w-2.5 h-2.5" /> Fixed
+                        </span>
+                      )}
+                    </dd>
+                  </div>
+
+                  <div className="p-2 bg-slate-50 border border-slate-200/60 rounded-lg">
+                    <dt className="text-[10px] font-medium text-slate-500">Rate / Fee</dt>
+                    <dd className="mt-0.5 font-mono font-bold text-slate-900 text-xs">
+                      {order.commission.type.toLowerCase() === 'percentage'
+                        ? `${order.commission.rate.toFixed(2)}%`
+                        : formatCurrency(order.commission.rate)}
+                    </dd>
+                  </div>
+
+                  <div className="p-2 bg-slate-50 border border-slate-200/60 rounded-lg">
+                    <dt className="text-[10px] font-medium text-slate-500">Commission Base</dt>
+                    <dd className="mt-0.5 font-semibold text-slate-900 text-xs">
+                      {formatCurrency(order.commission.commissionableAmount)}
+                    </dd>
+                  </div>
+
+                  <div className="p-2 bg-emerald-50/90 border border-emerald-200 rounded-lg">
+                    <dt className="text-[10px] font-medium text-emerald-800 font-semibold">Calculated Amount</dt>
+                    <dd className="mt-0.5 font-mono font-bold text-emerald-900 text-sm">
+                      {formatCurrency(order.commission.commissionAmount)}
+                    </dd>
+                  </div>
+
+                  <div className="col-span-2 text-[10px] text-slate-400 flex items-center justify-between border-t border-slate-100 pt-1.5">
+                    <span>Snapshot: {formatDateTime(order.commission.calculatedAt)}</span>
+                    {order.commission.ruleId && (
+                      <span className="font-mono">Rule #{order.commission.ruleId}</span>
+                    )}
+                  </div>
+                </dl>
+              ) : (
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/60 text-center text-xs text-slate-500">
+                  No commission calculated.
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/60 text-center space-y-1">
+              <p className="text-xs font-semibold text-slate-700">No Referring Doctor</p>
+              <p className="text-[11px] text-slate-400">
+                Self-referred lab order. No commission calculated.
+              </p>
+            </div>
+          )}
+        </Card>
+
+        {/* Billing & Invoice Card (F14.10) */}
+        <Card
+          title="Billing & Invoice"
+          subtitle="Laboratory billing & payment status"
+        >
+          {invoice ? (
+            <div className="space-y-3">
+              <div className="p-2.5 bg-blue-50/70 border border-blue-100 rounded-xl flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    <Receipt className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-mono font-bold text-blue-900 text-xs">
+                      {invoice.invoiceNumber}
+                    </p>
+                    <p className="text-[10px] text-slate-500">
+                      {new Date(invoice.invoiceDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    invoice.status === 'Paid'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : invoice.status === 'PartiallyPaid'
+                      ? 'bg-amber-100 text-amber-800'
+                      : invoice.status === 'Cancelled'
+                      ? 'bg-slate-100 text-slate-600'
+                      : 'bg-blue-100 text-blue-800'
+                  }`}
+                >
+                  {invoice.status}
+                </span>
+              </div>
+
+              <dl className="grid grid-cols-2 gap-2 text-xs">
+                <div className="p-2 bg-slate-50 border border-slate-200/60 rounded-lg">
+                  <dt className="text-[10px] font-medium text-slate-500">Grand Total</dt>
+                  <dd className="mt-0.5 font-mono font-bold text-slate-900 text-xs">
+                    {formatCurrency(invoice.grandTotal)}
+                  </dd>
+                </div>
+                <div className="p-2 bg-slate-50 border border-slate-200/60 rounded-lg">
+                  <dt className="text-[10px] font-medium text-slate-500">Paid Amount</dt>
+                  <dd className="mt-0.5 font-mono font-bold text-emerald-700 text-xs">
+                    {formatCurrency(invoice.paidAmount)}
+                  </dd>
+                </div>
+                <div className="col-span-2 p-2 bg-slate-50 border border-slate-200/60 rounded-lg flex items-center justify-between">
+                  <span className="text-[10px] font-medium text-slate-500">Outstanding Balance</span>
+                  <span
+                    className={`font-mono font-bold text-xs ${
+                      Number(invoice.outstandingAmount) > 0 ? 'text-rose-600' : 'text-slate-500'
+                    }`}
+                  >
+                    {formatCurrency(invoice.outstandingAmount)}
+                  </span>
+                </div>
+              </dl>
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-xs"
+                onClick={() => navigate(`/invoices/${invoice.id}`)}
+              >
+                View Full Invoice
+              </Button>
+            </div>
+          ) : (
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/60 text-center space-y-2">
+              <p className="text-xs font-semibold text-slate-700">Not Invoiced</p>
+              <p className="text-[11px] text-slate-400">
+                No billing invoice has been generated for this lab order yet.
+              </p>
+              {order.status !== 'Cancelled' && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="text-xs mt-1 w-full"
+                  onClick={() => setIsInvoiceModalOpen(true)}
+                >
+                  Generate Invoice
+                </Button>
+              )}
+            </div>
+          )}
         </Card>
       </div>
 
@@ -573,6 +741,19 @@ export const PathologyLabOrderDetailPage: React.FC = () => {
           onClose={() => setRejectTarget(null)}
           onSubmit={handleSubmitReject}
           onClearError={() => setRejectError(null)}
+        />
+      )}
+
+      {/* Invoice Modal (F14.10) */}
+      {isInvoiceModalOpen && (
+        <InvoiceModal
+          isOpen={isInvoiceModalOpen}
+          preselectedOrderId={order.id}
+          onClose={() => setIsInvoiceModalOpen(false)}
+          onSuccess={(newInv) => {
+            setInvoice(newInv);
+            toastSuccess(`Invoice ${newInv.invoiceNumber} generated successfully!`);
+          }}
         />
       )}
 

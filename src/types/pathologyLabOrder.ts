@@ -1,3 +1,5 @@
+import type { OrderCommissionDto } from './commission';
+
 export type PathologyLabOrderStatus = 'Ordered' | 'SampleCollected' | 'Processing' | 'ResultEntered' | 'Verified' | 'Reported' | 'Cancelled';
 
 export interface PathologyLabOrderItemDto {
@@ -21,6 +23,7 @@ export interface PathologyLabOrderDto {
   referringDoctorName?: string | null;
   referringDoctorRegistrationNumber?: string | null;
   referringDoctorSpecialization?: string | null;
+  commission?: OrderCommissionDto | null;
   items: PathologyLabOrderItemDto[];
   testCount: number;
   totalOrderValue: number;

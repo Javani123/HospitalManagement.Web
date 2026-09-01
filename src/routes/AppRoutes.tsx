@@ -30,6 +30,17 @@ import { ResultsPage } from '../pages/Pathology/ResultsPage';
 import { PathologyResultDetailPage } from '../pages/Pathology/PathologyResultDetailPage';
 import { ReportsPage } from '../pages/Pathology/ReportsPage';
 import { PathologyLabReportPage } from '../pages/Pathology/PathologyLabReportPage';
+import { CommissionRulesPage } from '../pages/Commission/CommissionRulesPage';
+import { InvoicesPage } from '../pages/Billing/InvoicesPage';
+import { InvoiceDetailPage } from '../pages/Billing/InvoiceDetailPage';
+import { PaymentsPage } from '../pages/Billing/PaymentsPage';
+import { PaymentDetailPage } from '../pages/Billing/PaymentDetailPage';
+import { AccountingDashboardPage } from '../pages/Accounting/AccountingDashboardPage';
+import { ChartOfAccountsPage } from '../pages/Accounting/ChartOfAccountsPage';
+import { JournalRegisterPage } from '../pages/Accounting/JournalRegisterPage';
+import { JournalEntryDetailPage } from '../pages/Accounting/JournalEntryDetailPage';
+import { GeneralLedgerPage } from '../pages/Accounting/GeneralLedgerPage';
+import { TrialBalancePage } from '../pages/Accounting/TrialBalancePage';
 import { SettingsPlaceholderPage } from '../pages/Settings/SettingsPlaceholderPage';
 import { NotFoundPage } from '../pages/NotFound/NotFoundPage';
 
@@ -93,6 +104,24 @@ export const AppRoutes: React.FC = () => {
           <Route path="/pathology/results/:id" element={<PathologyResultDetailPage />} />
           <Route path="/pathology/reports" element={<ReportsPage />} />
           <Route path="/pathology/reports/:orderId" element={<PathologyLabReportPage />} />
+
+          {/* ─── Doctor Commission Master Routes (F14.9) ────────────────────── */}
+          <Route path="/commissions" element={<CommissionRulesPage />} />
+          <Route path="/doctor-commissions" element={<Navigate to="/commissions" replace />} />
+
+          {/* ─── Billing & Invoices Routes (F14.10, F14.11) ─────────────────── */}
+          <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
+          <Route path="/payments" element={<PaymentsPage />} />
+          <Route path="/payments/:id" element={<PaymentDetailPage />} />
+
+          {/* ─── Accounting & General Ledger Routes (F15) ─────────────────────── */}
+          <Route path="/accounting" element={<AccountingDashboardPage />} />
+          <Route path="/accounting/accounts" element={<ChartOfAccountsPage />} />
+          <Route path="/accounting/journals" element={<JournalRegisterPage />} />
+          <Route path="/accounting/journals/:id" element={<JournalEntryDetailPage />} />
+          <Route path="/accounting/ledger" element={<GeneralLedgerPage />} />
+          <Route path="/accounting/trial-balance" element={<TrialBalancePage />} />
 
           {/* ─── Settings / Configuration ────────────────────────────────────── */}
           <Route path="/settings" element={<SettingsPlaceholderPage />} />

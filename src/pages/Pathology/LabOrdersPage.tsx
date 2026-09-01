@@ -50,6 +50,27 @@ export const LabOrdersPage: React.FC = () => {
     { key: 'orderDate', header: 'Order Date', render: (o) => formatDateTime(o.orderDate) },
     { key: 'testCount', header: 'Tests', align: 'center' },
     { key: 'totalOrderValue', header: 'Order Value', align: 'right', render: (o) => formatCurrency(o.totalOrderValue) },
+    {
+      key: 'commission',
+      header: 'Doctor Commission',
+      align: 'right',
+      render: (o) => (
+        o.commission ? (
+          <div className="text-right text-xs">
+            <span className="font-mono font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.5 rounded">
+              {formatCurrency(o.commission.commissionAmount)}
+            </span>
+            <span className="block text-[10px] text-slate-400 mt-0.5">
+              {o.commission.type.toLowerCase() === 'percentage'
+                ? `${o.commission.rate}% of ${formatCurrency(o.commission.commissionableAmount)}`
+                : 'Fixed Fee'}
+            </span>
+          </div>
+        ) : (
+          <span className="text-xs text-slate-400 italic">No Commission</span>
+        )
+      ),
+    },
     { key: 'status', header: 'Status', align: 'center', render: (o) => <StatusBadge status={o.status} /> },
     { key: '_actions', header: 'Actions', align: 'right', render: (o) => <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/pathology/lab-orders/${o.id}`); }}>View</Button> },
   ];

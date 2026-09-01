@@ -30,11 +30,22 @@ const routeTitleMap: Record<string, { title: string; section?: string }> = {
   '/pathology/reports': { title: 'Diagnostic Reports', section: 'Laboratory Workflow' },
   '/roles': { title: 'Roles & Permissions', section: 'Administration' },
   '/audit-actor': { title: 'Audit Actor', section: 'Administration' },
+  '/commissions': { title: 'Doctor Commission', section: 'Administration' },
+  '/invoices': { title: 'Billing & Invoices', section: 'Billing' },
+  '/payments': { title: 'Payments & Receipts', section: 'Billing' },
+  '/accounting': { title: 'Accounting Dashboard', section: 'Accounting' },
+  '/accounting/accounts': { title: 'Chart of Accounts', section: 'Accounting' },
+  '/accounting/journals': { title: 'Journal Register', section: 'Accounting' },
+  '/accounting/ledger': { title: 'General Ledger', section: 'Accounting' },
+  '/accounting/trial-balance': { title: 'Trial Balance', section: 'Accounting' },
   '/settings': { title: 'System Settings', section: 'Configuration' },
 };
 
 function resolveRouteMeta(pathname: string): { title: string; section?: string } {
   if (routeTitleMap[pathname]) return routeTitleMap[pathname];
+  if (/^\/accounting\/journals\/\d+$/.test(pathname)) return { title: 'Journal Entry Details', section: 'Accounting' };
+  if (/^\/invoices\/\d+$/.test(pathname)) return { title: 'Invoice Details', section: 'Billing' };
+  if (/^\/payments\/\d+$/.test(pathname)) return { title: 'Payment Details', section: 'Billing' };
   if (/^\/pathology\/lab-orders\/\d+$/.test(pathname)) return { title: 'Lab Order Details', section: 'Laboratory Workflow' };
   if (/^\/pathology\/lab-orders\/new$/.test(pathname)) return { title: 'Create Lab Order', section: 'Laboratory Workflow' };
   if (/^\/pathology\/samples\/\d+$/.test(pathname)) return { title: 'Sample Details', section: 'Laboratory Workflow' };

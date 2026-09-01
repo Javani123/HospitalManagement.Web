@@ -22,6 +22,12 @@ import {
   LogOut,
   Shield,
   Fingerprint,
+  Percent,
+  Receipt,
+  CreditCard,
+  Landmark,
+  BookOpen,
+  Layers,
 } from 'lucide-react';
 import { useTenant } from '../hooks/useTenant';
 import { useAuth } from '../hooks/useAuth';
@@ -42,8 +48,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
   const isPathologyRoute = location.pathname.startsWith('/pathology');
   const [isPathologyExpanded, setIsPathologyExpanded] = useState<boolean>(true);
 
+  // Accounting group expansion state
+  const isAccountingRoute = location.pathname.startsWith('/accounting');
+  const [isAccountingExpanded, setIsAccountingExpanded] = useState<boolean>(true);
+
   const togglePathology = () => {
     setIsPathologyExpanded((prev) => !prev);
+  };
+
+  const toggleAccounting = () => {
+    setIsAccountingExpanded((prev) => !prev);
   };
 
   const handleLogout = () => {
@@ -59,6 +73,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
   const canViewStaff = isAdmin || hasAnyRole(['Doctor', 'Technician', 'LabDirector', 'Receptionist', 'Nurse', 'Accountant']);
   const canViewDoctors = isAdmin || hasAnyRole(['Doctor', 'Technician', 'LabDirector', 'Receptionist', 'Nurse', 'Accountant']);
   const canViewTechnicians = isAdmin || hasAnyRole(['Doctor', 'Technician', 'LabDirector', 'Receptionist', 'Nurse', 'Accountant']);
+  const canViewCommissions = isAdmin || hasAnyRole(['Doctor', 'Accountant', 'Receptionist', 'LabDirector']);
+  const canViewInvoices = isAdmin || hasAnyRole(['Accountant', 'Receptionist', 'Doctor', 'LabDirector']);
+  const canViewPayments = isAdmin || hasAnyRole(['Accountant', 'Receptionist', 'Doctor', 'LabDirector']);
+  const canViewAccounting = isAdmin || hasRole('Accountant');
   const canViewPathology = isAdmin || hasAnyRole(['Technician', 'LabDirector', 'Doctor', 'Nurse']);
   const canViewRoles = isAdmin;
   const canViewAuditActor = isAdmin;
@@ -199,6 +217,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
                   onClick={onCloseMobile}
                 />
               )}
+              {canViewCommissions && (
+                <SidebarItem
+                  to="/commissions"
+                  icon={<Percent className="w-4 h-4" />}
+                  label="Doctor Commission"
+                  onClick={onCloseMobile}
+                />
+              )}
             </div>
           </div>
 
@@ -320,6 +346,107 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
                         onClick={onCloseMobile}
                       />
                     )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Billing & Finance Section (F14.10, F14.11) */}
+          {(canViewInvoices || canViewPayments) && (
+            <div>
+              <div className="px-3 mb-1.5 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+                Billing & Finance
+              </div>
+              <div className="space-y-1">
+                {canViewInvoices && (
+                  <SidebarItem
+                    to="/invoices"
+                    icon={<Receipt className="w-4 h-4" />}
+                    label="Invoices"
+                    onClick={onCloseMobile}
+                  />
+                )}
+                {canViewPayments && (
+                  <SidebarItem
+                    to="/payments"
+                    icon={<CreditCard className="w-4 h-4" />}
+                    label="Payments & Receipts"
+                    onClick={onCloseMobile}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Accounting & General Ledger Section (F15) */}
+          {canViewAccounting && (
+            <div>
+              <div className="px-3 mb-1.5 flex items-center justify-between">
+                <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+                  Accounting & Ledger
+                </span>
+              </div>
+
+              <div className="space-y-1">
+                <button
+                  type="button"
+                  onClick={toggleAccounting}
+                  aria-expanded={isAccountingExpanded}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                    isAccountingRoute
+                      ? 'text-blue-900 bg-blue-50/70 font-semibold'
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Landmark className={`w-4 h-4 ${isAccountingRoute ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <span>Accounting</span>
+                  </div>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                      isAccountingExpanded ? 'rotate-180 text-blue-600' : ''
+                    }`}
+                  />
+                </button>
+
+                {isAccountingExpanded && (
+                  <div className="pl-4 ml-3 border-l border-slate-200 space-y-0.5 mt-1 pt-0.5">
+                    <SidebarItem
+                      to="/accounting"
+                      icon={<LayoutDashboard className="w-3.5 h-3.5" />}
+                      label="Accounting Dashboard"
+                      isSubItem
+                      onClick={onCloseMobile}
+                    />
+                    <SidebarItem
+                      to="/accounting/accounts"
+                      icon={<BookOpen className="w-3.5 h-3.5" />}
+                      label="Chart of Accounts"
+                      isSubItem
+                      onClick={onCloseMobile}
+                    />
+                    <SidebarItem
+                      to="/accounting/journals"
+                      icon={<FileSpreadsheet className="w-3.5 h-3.5" />}
+                      label="Journal Register"
+                      isSubItem
+                      onClick={onCloseMobile}
+                    />
+                    <SidebarItem
+                      to="/accounting/ledger"
+                      icon={<Layers className="w-3.5 h-3.5" />}
+                      label="General Ledger"
+                      isSubItem
+                      onClick={onCloseMobile}
+                    />
+                    <SidebarItem
+                      to="/accounting/trial-balance"
+                      icon={<Scale className="w-3.5 h-3.5" />}
+                      label="Trial Balance"
+                      isSubItem
+                      onClick={onCloseMobile}
+                    />
                   </div>
                 )}
               </div>
